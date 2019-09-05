@@ -14,7 +14,13 @@ class _SettingsPreferenceState extends State<SettingsPreference> {
   var investmentsValue = 0.0;
   var recreationValue = 0.0;
   double recipe = 0.0;
+  var maxValuePercent = 100.0;
   var textRecipe = TextEditingController();
+  Slider sliderEssential;
+  Slider sliderOther;
+  Slider sliderInvestment;
+  Slider sliderRecreation;
+
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +90,25 @@ class _SettingsPreferenceState extends State<SettingsPreference> {
                   _item("Gastos Essenciais", Constants.ESSENTIAL),
                   _item("Outros Gastos", Constants.OTHER),
                   _item("Investimentos", Constants.INVESTMENTS),
-                  _item("Lazer", Constants.RECREATION)
+                  _item("Lazer", Constants.RECREATION),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(0, 20, 0, 20),
+                    child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.black54, width: 1.0),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Padding(
+                          padding: EdgeInsets.all(5),
+                          child: Text(r"R$ "+calculateTotal().toStringAsFixed(2),
+                            style: TextStyle(
+                                fontSize: 20,
+                                color: color(),
+                            ),
+                          ),
+                        )
+                    ),
+                  )
                 ],
               ),
             ),
@@ -106,6 +130,20 @@ class _SettingsPreferenceState extends State<SettingsPreference> {
         ],
       ),
     );
+  }
+
+  color(){
+    if(calculateTotal() > recipe){
+      return Colors.red;
+    }
+    return Colors.green;
+  }
+
+  double calculateTotal(){
+    return calculateValue(essencialValue.round())+
+        calculateValue(otherValue.round())+
+        calculateValue(investmentsValue.round())+
+        calculateValue(recreationValue.round());
   }
 
   Future<String> _showDialogEditRecipe(BuildContext context) async{
@@ -198,24 +236,33 @@ class _SettingsPreferenceState extends State<SettingsPreference> {
   }
 
   _slider(int type){
+    Slider slider;
     if(type == Constants.ESSENTIAL){
-      return Slider(
+      slider = Slider(
         activeColor: Colors.indigoAccent,
         label: essencialValue.round().toString()+"%",
         divisions: 100,
+        onChangeEnd: (value){
+            maxValuePercent = maxValuePercent - value;
+            print("valor: "+maxValuePercent.toString());
+        },
         min: 0.0,
         max: 100.0,
         onChanged: (newRating) {
-          setState(() => essencialValue = newRating);
+            setState(() => essencialValue = newRating);
         },
         value: essencialValue,
       );
     }
-    if(type == Constants.OTHER){
-      return Slider(
+    else if(type == Constants.OTHER){
+      slider = Slider(
         activeColor: Colors.indigoAccent,
         label: otherValue.round().toString()+"%",
         divisions: 100,
+        onChangeEnd: (value){
+          maxValuePercent = maxValuePercent - value;
+          print("valor: "+maxValuePercent.toString());
+        },
         min: 0.0,
         max: 100.0,
         onChanged: (newRating) {
@@ -224,11 +271,15 @@ class _SettingsPreferenceState extends State<SettingsPreference> {
         value: otherValue,
       );
     }
-    if(type == Constants.INVESTMENTS){
-      return Slider(
+    else if(type == Constants.INVESTMENTS){
+      slider = Slider(
         activeColor: Colors.indigoAccent,
         label: investmentsValue.round().toString()+"%",
         divisions: 100,
+        onChangeEnd: (value){
+          maxValuePercent = maxValuePercent - value;
+          print("valor: "+maxValuePercent.toString());
+        },
         min: 0.0,
         max: 100.0,
         onChanged: (newRating) {
@@ -237,17 +288,25 @@ class _SettingsPreferenceState extends State<SettingsPreference> {
         value: investmentsValue,
       );
     }
-    return Slider(
-      activeColor: Colors.indigoAccent,
-      label: recreationValue.round().toString()+"%",
-      divisions: 100,
-      min: 0.0,
-      max: 100.0,
-      onChanged: (newRating) {
-        setState(() => recreationValue = newRating);
-      },
-      value: recreationValue,
-    );
+    else if(type == Constants.RECREATION){
+      slider = Slider(
+        activeColor: Colors.indigoAccent,
+        label: recreationValue.round().toString()+"%",
+        divisions: 100,
+        onChangeEnd: (value){
+          maxValuePercent = maxValuePercent - value;
+          print("valor: "+maxValuePercent.toString());
+        },
+        min: 0.0,
+        max: 100.0,
+        onChanged: (newRating) {
+          setState(() => recreationValue = newRating);
+        },
+        value: recreationValue,
+      );
+    }
+
+    return slider;
 
   }
 
