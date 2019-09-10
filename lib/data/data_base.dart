@@ -30,7 +30,7 @@ class DatabaseHelper {
 
   void _onCreate(Database db, int version) async {
     await db.execute(
-        "CREATE TABLE Spent(id INTEGER PRIMARY KEY, value DECIMAL, type INTEGER)");
+        "CREATE TABLE Spent(id INTEGER PRIMARY KEY, value DECIMAL, type INTEGER, description TEXT, date DATETIME)");
     print("Table is created");
   }
 

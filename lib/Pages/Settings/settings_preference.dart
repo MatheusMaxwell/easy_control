@@ -1,4 +1,6 @@
+import 'package:easy_control/Utils/SharedPreferencesHelper.dart';
 import 'package:easy_control/ext/Components.dart';
+import 'package:easy_control/ext/Components.dart' as prefix0;
 import 'package:easy_control/ext/Constants.dart';
 import 'package:flutter/material.dart';
 
@@ -20,11 +22,18 @@ class _SettingsPreferenceState extends State<SettingsPreference> {
   Slider sliderOther;
   Slider sliderInvestment;
   Slider sliderRecreation;
+  final scaffoldKey = new GlobalKey<ScaffoldState>();
 
+  @override
+  void initState() {
+    super.initState();
+    getSharedPreferences();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: scaffoldKey,
       appBar: AppBar(
         title: Text("Configurações"),
         centerTitle: true,
@@ -119,7 +128,7 @@ class _SettingsPreferenceState extends State<SettingsPreference> {
               width: double.infinity,
               height: 50,
               child: RaisedButton(
-                onPressed: (){},
+                onPressed: saveValues,
                 shape: RoundedRectangleBorder(borderRadius: new BorderRadius.circular(10.0)),
                 color: Colors.blue,
                 child: Text("Salvar", style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),),
@@ -130,6 +139,23 @@ class _SettingsPreferenceState extends State<SettingsPreference> {
         ],
       ),
     );
+  }
+
+  saveValues()async{
+    if(calculateTotal() > recipe){
+      showSnackBar("O valor total é maior que sua receita.", scaffoldKey);
+    }
+    else{
+      if( await SharedPreferencesHelper.setRecipe(recipe) &&
+          await SharedPreferencesHelper.setEssential(essencialValue) &&
+          await SharedPreferencesHelper.setOther(otherValue) &&
+          await SharedPreferencesHelper.setInvestment(investmentsValue) &&
+          await SharedPreferencesHelper.setRecreation(recreationValue)){
+
+        showSnackBar("Salvo", scaffoldKey);
+
+      }
+    }
   }
 
   color(){
@@ -145,6 +171,39 @@ class _SettingsPreferenceState extends State<SettingsPreference> {
         calculateValue(investmentsValue.round())+
         calculateValue(recreationValue.round());
   }
+
+getSharedPreferences(){
+    SharedPreferencesHelper.getSharedRecipe().then((value){
+      setState(() {
+        recipe = value;
+      });
+    });
+    
+    SharedPreferencesHelper.getSharedEssential().then((value){
+      setState(() {
+        essencialValue = value;
+      });
+    });
+
+    SharedPreferencesHelper.getSharedOther().then((value){
+      setState(() {
+        otherValue = value;
+      });
+    });
+
+    SharedPreferencesHelper.getSharedInvestment().then((value){
+      setState(() {
+        investmentsValue = value;
+      });
+    });
+
+    SharedPreferencesHelper.getSharedRecreation().then((value){
+      setState(() {
+        recreationValue = value;
+      });
+    });
+    
+}
 
   Future<String> _showDialogEditRecipe(BuildContext context) async{
     String recipeValue = '';

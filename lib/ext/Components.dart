@@ -58,3 +58,9 @@ drawer(BuildContext context){
 Function navigation (String route, BuildContext context){
   Navigator.of(context).pushReplacementNamed(route);
 }
+
+Function showSnackBar(String text, GlobalKey<ScaffoldState> scaffoldKey){
+  scaffoldKey.currentState.showSnackBar(new SnackBar(
+    content: new Text(text),
+  ));
+}
